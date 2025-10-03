@@ -11,4 +11,6 @@
 ## Kết quả đạt được
 - Ứng dụng hiển thị ảnh đại diện tròn.
 - Hiển thị tên và địa chỉ người dùng ở giữa màn hình.
+- Chạy được các nút quay lại và edit.
 - Giao diện chạy ổn trên **medium phone API 36.1** (máy ảo).
+
