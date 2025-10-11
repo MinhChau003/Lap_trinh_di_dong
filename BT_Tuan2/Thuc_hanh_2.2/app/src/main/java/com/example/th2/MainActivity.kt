@@ -32,8 +32,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun EmailValidationScreen() {
-    var name by remember { mutableStateOf(TextFieldValue("")) }
-    var age by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var message by remember { mutableStateOf("") }
     var messageColor by remember { mutableStateOf(Color.Red) }
