@@ -37,12 +37,19 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// ---------------------- ViewModel (Lưu dữ liệu toàn bộ luồng) ----------------------
+// ---------------------- ViewModel ----------------------
+data class SubmittedData(
+    val email: String,
+    val otp: String,
+    val password: String
+)
+
 class ForgotViewModel : ViewModel() {
     var email by mutableStateOf("")
     var otpDigits = mutableStateListOf("", "", "", "", "")
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
+    var lastSubmittedData by mutableStateOf<SubmittedData?>(null)
 
     fun otpString(): String = otpDigits.joinToString("")
 
@@ -61,9 +68,13 @@ class ForgotViewModel : ViewModel() {
         email = ""
         resetAfterEmail()
     }
+
+    fun setLastSubmittedData(email: String, otp: String, password: String) {
+        lastSubmittedData = SubmittedData(email, otp, password)
+    }
 }
 
-// ---------------------- NAVIGATION ----------------------
+// ---------------------- Navigation ----------------------
 @Composable
 fun AppNavigator(vm: ForgotViewModel = viewModel()) {
     val navController = rememberNavController()
@@ -132,6 +143,25 @@ fun ForgotPasswordScreen(navController: NavHostController, vm: ForgotViewModel) 
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Next") }
+
+            // ----------- Hiển thị thông tin recap sau khi Submit -----------
+            vm.lastSubmittedData?.let { data ->
+                Spacer(Modifier.height(32.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text("Last Reset Summary", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                        Spacer(Modifier.height(8.dp))
+                        Text("Email: ${data.email}")
+                        Text("OTP: ${data.otp}")
+                        Text("Password: ${data.password}")
+                    }
+                }
+            }
         }
     }
 }
@@ -145,7 +175,6 @@ fun VerifyCodeScreen(navController: NavHostController, vm: ForgotViewModel) {
     Box(
         modifier = Modifier.fillMaxSize().padding(24.dp)
     ) {
-        // Nút back ở góc trái trên
         IconButton(
             onClick = { navController.popBackStack() },
             modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp)
@@ -330,9 +359,10 @@ fun ConfirmScreen(navController: NavHostController, vm: ForgotViewModel) {
             Spacer(Modifier.height(24.dp))
             Button(
                 onClick = {
+                    vm.setLastSubmittedData(vm.email, vm.otpString(), vm.password)
                     vm.resetAll()
                     navController.navigate("forgot") {
-                        popUpTo(0)
+                        popUpTo("forgot") { inclusive = false }
                     }
                 },
                 shape = RoundedCornerShape(24.dp),
